@@ -1,0 +1,59 @@
+<html>
+  <body>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+      <center>
+        <table>
+          <tr>
+            <th>
+              <label for="numRecords">Number of records to store:</label>
+            </th>
+            <td>
+              <input type="number" id="numRecords" name="numRecords" required>
+            </td>
+          </tr>
+        </table>
+        <div id="recordFields"></div>
+        <br>
+        <input type="submit" value="ADD">
+      </center>
+    </form>
+    <script>
+      document.getElementById('numRecords').addEventListener('change', function() {
+        const recordFieldsDiv = document.getElementById('recordFields');
+        const numRecords = parseInt(this.value, 10);
+        recordFieldsDiv.innerHTML = '';
+        for (let i = 1; i <= numRecords; i++) {
+          recordFieldsDiv.innerHTML += `
+            <div style="display: flex; justify-content: center; align-items: center;">
+              <label for="record${i}">Record ${i}:</label>
+              <button type="button" onclick="toggleInputType(${i})" id="toggleButton${i}">Text</button>
+              <label for="data${i}" style="margin-left: 10px;">Data ${i}:</label>
+              <div id="inputField${i}" style="margin-left: 10px;"></div>
+            </div>
+            <br>
+          `;
+        }
+      });
+
+      function toggleInputType(recordIndex) {
+        const toggleButton = document.getElementById(`toggleButton${recordIndex}`);
+        const inputFieldDiv = document.getElementById(`inputField${recordIndex}`);
+        const isFileInput = toggleButton.textContent === 'File';
+        toggleButton.textContent = isFileInput ? 'Text' : 'File';
+        inputFieldDiv.innerHTML = isFileInput ? getFileInputHTML(recordIndex) : getTextInputHTML(recordIndex);
+      }
+
+      function getTextInputHTML(recordIndex) {
+        return `
+          <input type="text" id="data${recordIndex}" name="data${recordIndex}">
+        `;
+      }
+
+      function getFileInputHTML(recordIndex) {
+        return `
+          <input type="file" id="data${recordIndex}" name="data">
+        `;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up Form</title>
+    <style>
+        #container {
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        #video {
+            width: 50%;
+            height: auto;
+            border: 1px solid black;
+            margin-right: 20px;
+        }
+        
+        #preview {
+            width: 50%;
+            height: auto;
+            border: 1px solid black;
+            display: none;
+        }
+    </style>
+    <script>
+        // Function to capture image from webcam
+        function captureImage() {
+            var video = document.getElementById('video');
+            var canvas = document.getElementById('canvas');
+            var context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Get the base64-encoded image data from the canvas
+            var imageData = canvas.toDataURL('image/jpeg');
+
+            // Assign the image data to the preview image element
+            var previewImage = document.getElementById('preview');
+            previewImage.src = imageData;
+            previewImage.style.display = 'block';
+
+            // Enable the submit button if the image is provided
+            var submitButton = document.getElementById('submitBtn');
+            submitButton.disabled = !(imageData);
+            // Assign the image data to a hidden input field in the form
+            document.getElementById('imageData').value =  imageData.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+        }
+    </script>
+</head>
+<body>
+    <h2>Sign Up</h2>
+    <div id="container">
+        <video id="video" autoplay></video>
+        <img id="preview" src="" alt="Captured Image">
+    </div>
+    <br><br>
+    <button onclick="captureImage()">Capture Image</button>
+    <br><br>
+    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+    <form action="http://localhost:3000/compare" method="post">
+        <input type="hidden" id="imageData" name="imageData">
+        <input type="submit" id="submitBtn" value="Submit" disabled>
+    </form>
+    <script>
+        // Get access to the webcam stream
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                var video = document.getElementById('video');
+                video.srcObject = stream;
+            })
+            .catch(function (error) {
+                console.log('Error accessing webcam:', error);
+            });
+    </script>
+</body>
+</html>

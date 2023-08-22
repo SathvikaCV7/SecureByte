@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Webcam Capture and MongoDB</title>
+</head>
+<body>
+    <center>
+        <form id="myForm1" method="POST" action="/signup">
+            <center>
+                <table>
+                  <tr>
+                    <th><label for="Name" class="Name">Name:</label>
+                        <input type="text" id="Name" name="Name" required></th>
+                </tr>
+                <tr>
+                    <th><label for="Password">Password:</label>
+                        <input type="password" id="Password" name="Password" required></th>
+                </tr>
+                <tr>
+                    <th><label for="Email">E-mail:</label>
+                        <input type="email" id="Email" name="Email" required></th>
+                </tr>
+                    <tr>
+                        <th>
+                            <label class="toggle">
+                                3 way verification
+                                <input class="toggle-checkbox" type="checkbox" name="verification" onchange="updateCheckboxValue(this.checked)">
+                                <div class="toggle-switch"></div>
+                                <span class="toggle-label"></span>
+                            </label>
+                        </th>
+                    </tr>
+                    <tr id="radioRow" style="display: none;">
+                        <th>
+                            <label for="emailRadio">
+                                <input type="radio" id="emailRadio" name="verificationType" value="email" onchange="updateVerificationType()">Email
+                            </label>
+                        </th>
+                        <th>
+                            <label for="smsRadio">
+                                <input type="radio" id="smsRadio" name="verificationType" value="sms" onchange="updateVerificationType()">SMS
+                            </label>
+                        </th>
+                    </tr>
+                </table>
+                <input type="hidden" name="form1CheckboxStatus" value="">
+                <input type="submit" value="Submit" onclick="postForm('myForm1')">
+            </center>
+        </form>
+        <form id="myForm" method="POST" action="/">
+            <input type="hidden" name="form2CheckboxStatus" value="">
+            <input type="hidden" name="verificationType1" value=""> <!-- Corrected the name attribute -->
+            <input type="submit" value="Google signin" onclick="postForm('myForm')">
+        </form>
+    </center>
+
+    <style>
+           *,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, ".SFNSText-Regular", "Helvetica Neue", "Roboto", "Segoe UI", sans-serif;
+}
+
+.toggle {
+  cursor: pointer;
+  display: inline-block;
+}
+
+.toggle-switch {
+  display: inline-block;
+  background: #ccc;
+  border-radius: 16px;
+  width: 58px;
+  height: 32px;
+  position: relative;
+  vertical-align: middle;
+  transition: background 0.25s;
+}
+.toggle-switch:before, .toggle-switch:after {
+  content: "";
+}
+.toggle-switch:before {
+  display: block;
+  background: linear-gradient(to bottom, #fff 0%, #eee 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  transition: left 0.25s;
+}
+.toggle:hover .toggle-switch:before {
+  background: linear-gradient(to bottom, #fff 0%, #fff 100%);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+.toggle-checkbox:checked + .toggle-switch {
+  background: #56c080;
+}
+.toggle-checkbox:checked + .toggle-switch:before {
+  left: 30px;
+}
+
+.toggle-checkbox {
+  position: absolute;
+  visibility: hidden;
+}
+
+.toggle-label {
+  margin-left: 5px;
+  position: relative;
+  top: 2px;
+}
+    </style>
+
+<script>
+  function updateCheckboxValue(checked) {
+      document.getElementsByName("form1CheckboxStatus")[0].value = checked ? "checked" : "";
+      document.getElementsByName("form2CheckboxStatus")[0].value = checked ? "checked" : "";
+
+      const radioRow = document.getElementById("radioRow");
+
+      if (checked) {
+          radioRow.style.display = "table-row";
+      } else {
+          radioRow.style.display = "none";
+          const radioButtons = document.querySelectorAll('input[name="verificationType"]');
+          radioButtons.forEach(radio => radio.checked = false);
+      }
+  }
+
+  function updateVerificationType() {
+      const radioButtons = document.querySelectorAll('input[name="verificationType"]');
+      let selectedVerificationType = "";
+      for (let radioButton of radioButtons) {
+          if (radioButton.checked) {
+              selectedVerificationType = radioButton.value;
+              break;
+          }
+      }
+      document.querySelector('input[name="verificationType1"]').value = selectedVerificationType;
+  }
+
+  function postForm(formId) {
+      const form = document.getElementById(formId);
+      const form1 = document.getElementById('myForm1'); // Corrected the variable name
+      if (formId === 'myForm') {
+          // Handling myForm (Google signin form)
+          const radioButtons = form1.querySelectorAll('input[name="verificationType"]');
+          let selectedVerificationType = "";
+          for (let radioButton of radioButtons) {
+              if (radioButton.checked) {
+                  selectedVerificationType = radioButton.value;
+                  break;
+              }
+          }
+          form.querySelector('input[name="verificationType1"]').value = selectedVerificationType;
+          form.querySelector('input[name="form1CheckboxStatus"]').value = ""; // Clear the value for myForm1's checkbox in case it was checked before
+      } else {
+          // Handling myForm1 (Default form)
+          const checkbox = form.querySelector('input[name="verification"]');
+          form.querySelector('input[name="verificationType1"]').value = checkbox.checked ? 'email' : ''; // Set the verificationType based on checkbox status
+      }
+
+      // Submit the form
+      form.submit();
+  }
+</script>
+
+</body>
+</html>

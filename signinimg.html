@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Webcam Capture and Base64 Image</title>
+</head>
+<body>
+    <h1>Webcam Capture and Base64 Image</h1>
+    <div>
+        <button id="startBtn">Start Webcam</button>
+        <button id="captureBtn">Capture</button>
+    </div>
+    <div>
+        <video id="video" width="640" height="480" autoplay></video>
+    </div>
+    <form id="imageForm" action="/compare" method="post">
+        <input type="hidden" id="base64ImageInput" name="base64Image">
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const video = document.getElementById('video');
+        const imageForm = document.getElementById('imageForm');
+        const base64ImageInput = document.getElementById('base64ImageInput');
+        let stream;
+        let videoStream;
+
+        startBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                videoStream = stream.getVideoTracks()[0];
+            } catch (error) {
+                console.error('Error accessing the webcam: ', error);
+            }
+        });
+
+        captureBtn.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            base64ImageInput.value = dataUrl;
+            imageForm.submit();
+        });
+
+        // Stop the video stream when leaving the page
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach((track) => {
+                    track.stop();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
